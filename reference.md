@@ -28,9 +28,7 @@ Retrieve all actions.
 
 ```go
 request := &management.ListActionsRequestParameters{
-        TriggerID: management.String(
-            "triggerId",
-        ),
+        TriggerID: management.ActionTriggerTypeEnumPostLogin.Ptr(),
         ActionName: management.String(
             "actionName",
         ),
@@ -149,7 +147,7 @@ request := &management.CreateActionRequestContent{
         Name: "name",
         SupportedTriggers: []*management.ActionTrigger{
             &management.ActionTrigger{
-                ID: "id",
+                ID: management.ActionTriggerTypeEnumPostLogin,
             },
         },
     }
@@ -887,7 +885,6 @@ Create a client grant for a machine-to-machine login flow. To learn more, read <
 
 ```go
 request := &management.CreateClientGrantRequestContent{
-        ClientID: "client_id",
         Audience: "audience",
     }
 client.ClientGrants.Create(
@@ -909,7 +906,7 @@ client.ClientGrants.Create(
 <dl>
 <dd>
 
-**clientID:** `string` — ID of the client.
+**clientID:** `*string` — ID of the client.
     
 </dd>
 </dl>
@@ -1279,6 +1276,9 @@ request := &management.ListClientsRequestParameters{
         AppType: management.String(
             "app_type",
         ),
+        ExternalClientID: management.String(
+            "external_client_id",
+        ),
         Q: management.String(
             "q",
         ),
@@ -1366,7 +1366,15 @@ client.Clients.List(
 <dl>
 <dd>
 
-**q:** `*string` — Advanced Query in <a href="http://www.lucenetutorial.com/lucene-query-syntax.html">Lucene</a> syntax.<br /><b>Permitted Queries</b>:<br /><ul><li><i>client_grant.organization_id:{organization_id}</i></li><li><i>client_grant.allow_any_organization:true</i></li></ul><b>Additional Restrictions</b>:<br /><ul><li>Cannot be used in combination with other filters</li><li>Requires use of the <i>from</i> and <i>take</i> paging parameters (checkpoint paginatinon)</li><li>Reduced rate limits apply. See <a href="https://auth0.com/docs/troubleshoot/customer-support/operational-policies/rate-limit-policy/rate-limit-configurations/enterprise-public">Rate Limit Configurations</a></li></ul><i><b>Note</b>: Recent updates may not be immediately reflected in query results</i>
+**externalClientID:** `*string` — Optional filter by the <a href="https://www.ietf.org/archive/id/draft-ietf-oauth-client-id-metadata-document-04.html">Client ID Metadata Document</a> URI for CIMD-registered clients.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**q:** `*string` — Advanced Query in <a href="https://lucene.apache.org/core/2_9_4/queryparsersyntax.html">Lucene</a> syntax.<br /><b>Permitted Queries</b>:<br /><ul><li><i>client_grant.organization_id:{organization_id}</i></li><li><i>client_grant.allow_any_organization:true</i></li></ul><b>Additional Restrictions</b>:<br /><ul><li>Cannot be used in combination with other filters</li><li>Requires use of the <i>from</i> and <i>take</i> paging parameters (checkpoint paginatinon)</li><li>Reduced rate limits apply. See <a href="https://auth0.com/docs/troubleshoot/customer-support/operational-policies/rate-limit-policy/rate-limit-configurations/enterprise-public">Rate Limit Configurations</a></li></ul><i><b>Note</b>: Recent updates may not be immediately reflected in query results</i>
     
 </dd>
 </dl>
@@ -1837,6 +1845,135 @@ See https://auth0.com/docs/secure/security-guidance/measures-against-app-imperso
 <dd>
 
 **asyncApprovalNotificationChannels:** `*management.ClientAsyncApprovalNotificationsChannelsAPIPostConfiguration` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Clients.PreviewCimdMetadata(request) -> *management.PreviewCimdMetadataResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+
+      Fetches and validates a Client ID Metadata Document without creating a client.
+      Returns the raw metadata and how it would be mapped to Auth0 client fields.
+      This endpoint is useful for testing metadata URIs before creating CIMD clients.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.PreviewCimdMetadataRequestContent{
+        ExternalClientID: "external_client_id",
+    }
+client.Clients.PreviewCimdMetadata(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**externalClientID:** `string` — URL to the Client ID Metadata Document
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Clients.RegisterCimdClient(request) -> *management.RegisterCimdClientResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+
+      Idempotent registration for Client ID Metadata Document (CIMD) clients.
+      Uses external_client_id as the unique identifier for upsert operations.
+      **Create:** Returns 201 when a new client is created (requires \
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.RegisterCimdClientRequestContent{
+        ExternalClientID: "external_client_id",
+    }
+client.Clients.RegisterCimdClient(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**externalClientID:** `string` — URL to the Client ID Metadata Document. Acts as the unique identifier for upsert operations.
     
 </dd>
 </dl>
@@ -3271,7 +3408,7 @@ client.Connections.Create(
 <dl>
 <dd>
 
-**enabledClients:** `[]string` — DEPRECATED property. Use the PATCH /v2/connections/{id}/clients endpoint to enable the connection for a set of clients.
+**enabledClients:** `[]string` — Use of this property is NOT RECOMMENDED. Use the PATCH /v2/connections/{id}/clients endpoint to enable the connection for a set of clients.
     
 </dd>
 </dl>
@@ -3727,7 +3864,7 @@ client.CustomDomains.List(
 <dl>
 <dd>
 
-**q:** `*string` — Query in <a href ="http://www.lucenetutorial.com/lucene-query-syntax.html">Lucene query string syntax</a>.
+**q:** `*string` — Query in <a href ="https://lucene.apache.org/core/2_9_4/queryparsersyntax.html">Lucene query string syntax</a>.
     
 </dd>
 </dl>
@@ -3875,6 +4012,109 @@ client.CustomDomains.Create(
 <dd>
 
 **relyingPartyIdentifier:** `*string` — Relying Party ID (rpId) to be used for Passkeys on this custom domain. If not provided, the full domain will be used.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.CustomDomains.GetDefault() -> *management.GetDefaultDomainResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the tenant's default domain.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.CustomDomains.GetDefault(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.CustomDomains.SetDefault(request) -> *management.UpdateDefaultDomainResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Set the default custom domain for the tenant.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.SetDefaultCustomDomainRequestContent{
+        Domain: "domain",
+    }
+client.CustomDomains.SetDefault(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**domain:** `string` — The domain to set as the default custom domain. Must be a verified custom domain or the canonical domain.
     
 </dd>
 </dl>
@@ -6459,6 +6699,64 @@ client.Groups.Get(
 </dl>
 </details>
 
+<details><summary><code>client.Groups.Delete(ID) -> error</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a group by its ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Groups.Delete(
+        context.TODO(),
+        "id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier for the group (service-generated).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Hooks
 <details><summary><code>client.Hooks.List() -> *management.ListHooksOffsetPaginatedResponseContent</code></summary>
 <dl>
@@ -7946,7 +8244,6 @@ Create a new access control list for your client.
 request := &management.CreateNetworkACLRequestContent{
         Description: "description",
         Active: true,
-        Priority: 1.1,
         Rule: &management.NetworkACLRule{
             Action: &management.NetworkACLAction{},
             Scope: management.NetworkACLRuleScopeEnumManagement,
@@ -7987,7 +8284,7 @@ client.NetworkACLs.Create(
 <dl>
 <dd>
 
-**priority:** `float64` — Indicates the order in which the ACL will be evaluated relative to other ACL rules.
+**priority:** `*float64` — Indicates the order in which the ACL will be evaluated relative to other ACL rules.
     
 </dd>
 </dl>
@@ -8095,7 +8392,6 @@ Update existing access control list for your client.
 request := &management.SetNetworkACLRequestContent{
         Description: "description",
         Active: true,
-        Priority: 1.1,
         Rule: &management.NetworkACLRule{
             Action: &management.NetworkACLAction{},
             Scope: management.NetworkACLRuleScopeEnumManagement,
@@ -8145,7 +8441,7 @@ client.NetworkACLs.Set(
 <dl>
 <dd>
 
-**priority:** `float64` — Indicates the order in which the ACL will be evaluated relative to other ACL rules.
+**priority:** `*float64` — Indicates the order in which the ACL will be evaluated relative to other ACL rules.
     
 </dd>
 </dl>
@@ -8915,6 +9211,122 @@ client.Prompts.UpdateSettings(
 </details>
 
 ## RefreshTokens
+<details><summary><code>client.RefreshTokens.List() -> *management.GetRefreshTokensPaginatedResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a paginated list of refresh tokens for a specific user, with optional filtering by client ID. Results are sorted by credential_id ascending.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.GetRefreshTokensRequestParameters{
+        UserID: "user_id",
+        ClientID: management.String(
+            "client_id",
+        ),
+        From: management.String(
+            "from",
+        ),
+        Take: management.Int(
+            1,
+        ),
+        Fields: management.String(
+            "fields",
+        ),
+        IncludeFields: management.Bool(
+            true,
+        ),
+    }
+client.RefreshTokens.List(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**userID:** `string` — ID of the user whose refresh tokens to retrieve. Required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientID:** `*string` — Filter results by client ID. Only valid when user_id is provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**from:** `*string` — An opaque cursor from which to start the selection (exclusive). Expires after 24 hours. Obtained from the next property of a previous response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**take:** `*int` — Number of results per page. Defaults to 50.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**fields:** `*string` — Comma-separated list of fields to include or exclude (based on value provided for include_fields) in the result. Leave empty to retrieve all fields.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeFields:** `*bool` — Whether specified fields are to be included (true) or excluded (false).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.RefreshTokens.Get(ID) -> *management.GetRefreshTokenResponseContent</code></summary>
 <dl>
 <dd>
@@ -9301,6 +9713,14 @@ client.ResourceServers.Create(
 <dl>
 <dd>
 
+**allowOnlineAccess:** `*bool` — Whether Online Refresh Tokens can be issued for this API (true) or not (false).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **tokenLifetime:** `*int` — Expiration value (in seconds) for access tokens issued for this API from the token endpoint.
     
 </dd>
@@ -9604,6 +10024,14 @@ client.ResourceServers.Update(
 <dd>
 
 **allowOfflineAccess:** `*bool` — Whether refresh tokens can be issued for this API (true) or not (false).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**allowOnlineAccess:** `*bool` — Whether Online Refresh Tokens can be issued for this API (true) or not (false).
     
 </dd>
 </dl>
@@ -13031,7 +13459,7 @@ client.Users.List(
 <dl>
 <dd>
 
-**q:** `*string` — Query in <a target='_new' href ='http://www.lucenetutorial.com/lucene-query-syntax.html'>Lucene query string syntax</a>. Some query types cannot be used on metadata fields, for details see <a href='https://auth0.com/docs/users/search/v3/query-syntax#searchable-fields'>Searchable Fields</a>.
+**q:** `*string` — Query in <a target='_new' href ='https://lucene.apache.org/core/2_9_4/queryparsersyntax.html'>Lucene query string syntax</a>. Some query types cannot be used on metadata fields, for details see <a href='https://auth0.com/docs/users/search/v3/query-syntax#searchable-fields'>Searchable Fields</a>.
     
 </dd>
 </dl>
@@ -14992,7 +15420,7 @@ request := &management.ListActionTriggerBindingsRequestParameters{
     }
 client.Actions.Triggers.Bindings.List(
         context.TODO(),
-        "triggerId",
+        management.ActionTriggerTypeEnumPostLogin.Ptr(),
         request,
     )
 }
@@ -15010,7 +15438,7 @@ client.Actions.Triggers.Bindings.List(
 <dl>
 <dd>
 
-**triggerID:** `management.ActionTriggerTypeEnum` — An actions extensibility point.
+**triggerID:** `*management.ActionTriggerTypeEnum` — An actions extensibility point.
     
 </dd>
 </dl>
@@ -15068,7 +15496,7 @@ Update the actions that are bound (i.e. attached) to a trigger. Once an action i
 request := &management.UpdateActionBindingsRequestContent{}
 client.Actions.Triggers.Bindings.UpdateMany(
         context.TODO(),
-        "triggerId",
+        management.ActionTriggerTypeEnumPostLogin.Ptr(),
         request,
     )
 }
@@ -15086,7 +15514,7 @@ client.Actions.Triggers.Bindings.UpdateMany(
 <dl>
 <dd>
 
-**triggerID:** `management.ActionTriggerTypeEnum` — An actions extensibility point.
+**triggerID:** `*management.ActionTriggerTypeEnum` — An actions extensibility point.
     
 </dd>
 </dl>
@@ -17657,6 +18085,14 @@ client.Clients.Credentials.Create(
 <dd>
 
 **expiresAt:** `*time.Time` — The ISO 8601 formatted date representing the expiration of the credential. If not specified (not recommended), the credential never expires. Applies to `public_key` credential type.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**kid:** `*string` — Optional kid (Key ID), used to uniquely identify the credential. If not specified, a kid value will be auto-generated. The kid header parameter in JWTs sent by your client should match this value. Valid format is [0-9a-zA-Z-_]{10,64}
     
 </dd>
 </dl>
@@ -24442,6 +24878,411 @@ client.Organizations.ClientGrants.Delete(
 </dl>
 </details>
 
+## Organizations Connections
+<details><summary><code>client.Organizations.Connections.List(ID) -> *management.ListOrganizationAllConnectionsOffsetPaginatedResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.ListOrganizationAllConnectionsRequestParameters{
+        Page: management.Int(
+            1,
+        ),
+        PerPage: management.Int(
+            1,
+        ),
+        IncludeTotals: management.Bool(
+            true,
+        ),
+        IsEnabled: management.Bool(
+            true,
+        ),
+    }
+client.Organizations.Connections.List(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Organization identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `*int` — Page index of the results to return. First page is 0.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**perPage:** `*int` — Number of results per page. Defaults to 50.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotals:** `*bool` — Return results inside an object that contains the total result count (true) or as a direct array of results (false, default).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isEnabled:** `*bool` — Filter connections by enabled status.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Organizations.Connections.Create(ID, request) -> *management.CreateOrganizationAllConnectionResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.CreateOrganizationAllConnectionRequestParameters{
+        ConnectionID: "connection_id",
+    }
+client.Organizations.Connections.Create(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Organization identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**organizationConnectionName:** `*string` — Name of the connection in the scope of this organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**assignMembershipOnLogin:** `*bool` — When true, all users that log in with this connection will be automatically granted membership in the organization. When false, users must be granted membership in the organization before logging in with this connection.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showAsButton:** `*bool` — Determines whether a connection should be displayed on this organization’s login prompt. Only applicable for enterprise connections. Default: true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isSignupEnabled:** `*bool` — Determines whether organization signup should be enabled for this organization connection. Only applicable for database connections. Default: false.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**organizationAccessLevel:** `*management.OrganizationAccessLevelEnum` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isEnabled:** `*bool` — Whether the connection is enabled for the organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connectionID:** `string` — Connection identifier.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Organizations.Connections.Get(ID, ConnectionID) -> *management.GetOrganizationAllConnectionResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Organizations.Connections.Get(
+        context.TODO(),
+        "id",
+        "connection_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Organization identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connectionID:** `string` — Connection identifier.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Organizations.Connections.Delete(ID, ConnectionID) -> error</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Organizations.Connections.Delete(
+        context.TODO(),
+        "id",
+        "connection_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Organization identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connectionID:** `string` — Connection identifier.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Organizations.Connections.Update(ID, ConnectionID, request) -> *management.UpdateOrganizationAllConnectionResponseContent</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &management.UpdateOrganizationConnectionRequestParameters{}
+client.Organizations.Connections.Update(
+        context.TODO(),
+        "id",
+        "connection_id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Organization identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connectionID:** `string` — Connection identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**organizationConnectionName:** `*string` — Name of the connection in the scope of this organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**assignMembershipOnLogin:** `*bool` — When true, all users that log in with this connection will be automatically granted membership in the organization. When false, users must be granted membership in the organization before logging in with this connection.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showAsButton:** `*bool` — Determines whether a connection should be displayed on this organization’s login prompt. Only applicable for enterprise connections. Default: true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isSignupEnabled:** `*bool` — Determines whether organization signup should be enabled for this organization connection. Only applicable for database connections. Default: false.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**organizationAccessLevel:** `*management.OrganizationAccessLevelEnumWithNull` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isEnabled:** `*bool` — Whether the connection is enabled for the organization.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Organizations DiscoveryDomains
 <details><summary><code>client.Organizations.DiscoveryDomains.List(ID) -> *management.ListOrganizationDiscoveryDomainsResponseContent</code></summary>
 <dl>
@@ -24456,6 +25297,7 @@ client.Organizations.ClientGrants.Delete(
 <dd>
 
 Retrieve list of all organization discovery domains associated with the specified organization.
+This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 </dd>
 </dl>
 </dd>
@@ -24625,7 +25467,7 @@ client.Organizations.DiscoveryDomains.Create(
 <dd>
 
 Retrieve details about a single organization discovery domain specified by domain name.
-
+This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 </dd>
 </dl>
 </dd>
@@ -24692,7 +25534,8 @@ client.Organizations.DiscoveryDomains.GetByName(
 <dl>
 <dd>
 
-Retrieve details about a single organization discovery domain specified by ID. 
+Retrieve details about a single organization discovery domain specified by ID.
+This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 </dd>
 </dl>
 </dd>

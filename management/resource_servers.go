@@ -18,17 +18,18 @@ var (
 	createResourceServerResponseContentFieldSigningAlg                                = big.NewInt(1 << 5)
 	createResourceServerResponseContentFieldSigningSecret                             = big.NewInt(1 << 6)
 	createResourceServerResponseContentFieldAllowOfflineAccess                        = big.NewInt(1 << 7)
-	createResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 8)
-	createResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 9)
-	createResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 10)
-	createResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 11)
-	createResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 12)
-	createResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 13)
-	createResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 14)
-	createResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 15)
-	createResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 16)
-	createResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 17)
-	createResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 18)
+	createResourceServerResponseContentFieldAllowOnlineAccess                         = big.NewInt(1 << 8)
+	createResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 9)
+	createResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 10)
+	createResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 11)
+	createResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 12)
+	createResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 13)
+	createResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 14)
+	createResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 15)
+	createResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 16)
+	createResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 17)
+	createResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 18)
+	createResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 19)
 )
 
 type CreateResourceServerResponseContent struct {
@@ -47,6 +48,8 @@ type CreateResourceServerResponseContent struct {
 	SigningSecret *string `json:"signing_secret,omitempty" url:"signing_secret,omitempty"`
 	// Whether refresh tokens can be issued for this API (true) or not (false).
 	AllowOfflineAccess *bool `json:"allow_offline_access,omitempty" url:"allow_offline_access,omitempty"`
+	// Whether Online Refresh Tokens can be issued for this API (true) or not (false).
+	AllowOnlineAccess *bool `json:"allow_online_access,omitempty" url:"allow_online_access,omitempty"`
 	// Whether to skip user consent for applications flagged as first party (true) or not (false).
 	SkipConsentForVerifiableFirstPartyClients *bool `json:"skip_consent_for_verifiable_first_party_clients,omitempty" url:"skip_consent_for_verifiable_first_party_clients,omitempty"`
 	// Expiration value (in seconds) for access tokens issued for this API from the token endpoint.
@@ -58,7 +61,7 @@ type CreateResourceServerResponseContent struct {
 	TokenDialect             *ResourceServerTokenDialectResponseEnum `json:"token_dialect,omitempty" url:"token_dialect,omitempty"`
 	TokenEncryption          *ResourceServerTokenEncryption          `json:"token_encryption,omitempty" url:"token_encryption,omitempty"`
 	ConsentPolicy            *ResourceServerConsentPolicyEnum        `json:"consent_policy,omitempty" url:"consent_policy,omitempty"`
-	AuthorizationDetails     []interface{}                           `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
+	AuthorizationDetails     []any                                   `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
 	ProofOfPossession        *ResourceServerProofOfPossession        `json:"proof_of_possession,omitempty" url:"proof_of_possession,omitempty"`
 	SubjectTypeAuthorization *ResourceServerSubjectTypeAuthorization `json:"subject_type_authorization,omitempty" url:"subject_type_authorization,omitempty"`
 	// The client ID of the client that this resource server is linked to
@@ -127,6 +130,13 @@ func (c *CreateResourceServerResponseContent) GetAllowOfflineAccess() bool {
 	return *c.AllowOfflineAccess
 }
 
+func (c *CreateResourceServerResponseContent) GetAllowOnlineAccess() bool {
+	if c == nil || c.AllowOnlineAccess == nil {
+		return false
+	}
+	return *c.AllowOnlineAccess
+}
+
 func (c *CreateResourceServerResponseContent) GetSkipConsentForVerifiableFirstPartyClients() bool {
 	if c == nil || c.SkipConsentForVerifiableFirstPartyClients == nil {
 		return false
@@ -176,7 +186,7 @@ func (c *CreateResourceServerResponseContent) GetConsentPolicy() ResourceServerC
 	return *c.ConsentPolicy
 }
 
-func (c *CreateResourceServerResponseContent) GetAuthorizationDetails() []interface{} {
+func (c *CreateResourceServerResponseContent) GetAuthorizationDetails() []any {
 	if c == nil || c.AuthorizationDetails == nil {
 		return nil
 	}
@@ -274,6 +284,13 @@ func (c *CreateResourceServerResponseContent) SetAllowOfflineAccess(allowOffline
 	c.require(createResourceServerResponseContentFieldAllowOfflineAccess)
 }
 
+// SetAllowOnlineAccess sets the AllowOnlineAccess field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateResourceServerResponseContent) SetAllowOnlineAccess(allowOnlineAccess *bool) {
+	c.AllowOnlineAccess = allowOnlineAccess
+	c.require(createResourceServerResponseContentFieldAllowOnlineAccess)
+}
+
 // SetSkipConsentForVerifiableFirstPartyClients sets the SkipConsentForVerifiableFirstPartyClients field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (c *CreateResourceServerResponseContent) SetSkipConsentForVerifiableFirstPartyClients(skipConsentForVerifiableFirstPartyClients *bool) {
@@ -325,7 +342,7 @@ func (c *CreateResourceServerResponseContent) SetConsentPolicy(consentPolicy *Re
 
 // SetAuthorizationDetails sets the AuthorizationDetails field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreateResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []interface{}) {
+func (c *CreateResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []any) {
 	c.AuthorizationDetails = authorizationDetails
 	c.require(createResourceServerResponseContentFieldAuthorizationDetails)
 }
@@ -402,17 +419,18 @@ var (
 	getResourceServerResponseContentFieldSigningAlg                                = big.NewInt(1 << 5)
 	getResourceServerResponseContentFieldSigningSecret                             = big.NewInt(1 << 6)
 	getResourceServerResponseContentFieldAllowOfflineAccess                        = big.NewInt(1 << 7)
-	getResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 8)
-	getResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 9)
-	getResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 10)
-	getResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 11)
-	getResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 12)
-	getResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 13)
-	getResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 14)
-	getResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 15)
-	getResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 16)
-	getResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 17)
-	getResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 18)
+	getResourceServerResponseContentFieldAllowOnlineAccess                         = big.NewInt(1 << 8)
+	getResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 9)
+	getResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 10)
+	getResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 11)
+	getResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 12)
+	getResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 13)
+	getResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 14)
+	getResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 15)
+	getResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 16)
+	getResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 17)
+	getResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 18)
+	getResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 19)
 )
 
 type GetResourceServerResponseContent struct {
@@ -431,6 +449,8 @@ type GetResourceServerResponseContent struct {
 	SigningSecret *string `json:"signing_secret,omitempty" url:"signing_secret,omitempty"`
 	// Whether refresh tokens can be issued for this API (true) or not (false).
 	AllowOfflineAccess *bool `json:"allow_offline_access,omitempty" url:"allow_offline_access,omitempty"`
+	// Whether Online Refresh Tokens can be issued for this API (true) or not (false).
+	AllowOnlineAccess *bool `json:"allow_online_access,omitempty" url:"allow_online_access,omitempty"`
 	// Whether to skip user consent for applications flagged as first party (true) or not (false).
 	SkipConsentForVerifiableFirstPartyClients *bool `json:"skip_consent_for_verifiable_first_party_clients,omitempty" url:"skip_consent_for_verifiable_first_party_clients,omitempty"`
 	// Expiration value (in seconds) for access tokens issued for this API from the token endpoint.
@@ -442,7 +462,7 @@ type GetResourceServerResponseContent struct {
 	TokenDialect             *ResourceServerTokenDialectResponseEnum `json:"token_dialect,omitempty" url:"token_dialect,omitempty"`
 	TokenEncryption          *ResourceServerTokenEncryption          `json:"token_encryption,omitempty" url:"token_encryption,omitempty"`
 	ConsentPolicy            *ResourceServerConsentPolicyEnum        `json:"consent_policy,omitempty" url:"consent_policy,omitempty"`
-	AuthorizationDetails     []interface{}                           `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
+	AuthorizationDetails     []any                                   `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
 	ProofOfPossession        *ResourceServerProofOfPossession        `json:"proof_of_possession,omitempty" url:"proof_of_possession,omitempty"`
 	SubjectTypeAuthorization *ResourceServerSubjectTypeAuthorization `json:"subject_type_authorization,omitempty" url:"subject_type_authorization,omitempty"`
 	// The client ID of the client that this resource server is linked to
@@ -511,6 +531,13 @@ func (g *GetResourceServerResponseContent) GetAllowOfflineAccess() bool {
 	return *g.AllowOfflineAccess
 }
 
+func (g *GetResourceServerResponseContent) GetAllowOnlineAccess() bool {
+	if g == nil || g.AllowOnlineAccess == nil {
+		return false
+	}
+	return *g.AllowOnlineAccess
+}
+
 func (g *GetResourceServerResponseContent) GetSkipConsentForVerifiableFirstPartyClients() bool {
 	if g == nil || g.SkipConsentForVerifiableFirstPartyClients == nil {
 		return false
@@ -560,7 +587,7 @@ func (g *GetResourceServerResponseContent) GetConsentPolicy() ResourceServerCons
 	return *g.ConsentPolicy
 }
 
-func (g *GetResourceServerResponseContent) GetAuthorizationDetails() []interface{} {
+func (g *GetResourceServerResponseContent) GetAuthorizationDetails() []any {
 	if g == nil || g.AuthorizationDetails == nil {
 		return nil
 	}
@@ -658,6 +685,13 @@ func (g *GetResourceServerResponseContent) SetAllowOfflineAccess(allowOfflineAcc
 	g.require(getResourceServerResponseContentFieldAllowOfflineAccess)
 }
 
+// SetAllowOnlineAccess sets the AllowOnlineAccess field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GetResourceServerResponseContent) SetAllowOnlineAccess(allowOnlineAccess *bool) {
+	g.AllowOnlineAccess = allowOnlineAccess
+	g.require(getResourceServerResponseContentFieldAllowOnlineAccess)
+}
+
 // SetSkipConsentForVerifiableFirstPartyClients sets the SkipConsentForVerifiableFirstPartyClients field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (g *GetResourceServerResponseContent) SetSkipConsentForVerifiableFirstPartyClients(skipConsentForVerifiableFirstPartyClients *bool) {
@@ -709,7 +743,7 @@ func (g *GetResourceServerResponseContent) SetConsentPolicy(consentPolicy *Resou
 
 // SetAuthorizationDetails sets the AuthorizationDetails field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (g *GetResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []interface{}) {
+func (g *GetResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []any) {
 	g.AuthorizationDetails = authorizationDetails
 	g.require(getResourceServerResponseContentFieldAuthorizationDetails)
 }
@@ -918,17 +952,18 @@ var (
 	resourceServerFieldSigningAlg                                = big.NewInt(1 << 5)
 	resourceServerFieldSigningSecret                             = big.NewInt(1 << 6)
 	resourceServerFieldAllowOfflineAccess                        = big.NewInt(1 << 7)
-	resourceServerFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 8)
-	resourceServerFieldTokenLifetime                             = big.NewInt(1 << 9)
-	resourceServerFieldTokenLifetimeForWeb                       = big.NewInt(1 << 10)
-	resourceServerFieldEnforcePolicies                           = big.NewInt(1 << 11)
-	resourceServerFieldTokenDialect                              = big.NewInt(1 << 12)
-	resourceServerFieldTokenEncryption                           = big.NewInt(1 << 13)
-	resourceServerFieldConsentPolicy                             = big.NewInt(1 << 14)
-	resourceServerFieldAuthorizationDetails                      = big.NewInt(1 << 15)
-	resourceServerFieldProofOfPossession                         = big.NewInt(1 << 16)
-	resourceServerFieldSubjectTypeAuthorization                  = big.NewInt(1 << 17)
-	resourceServerFieldClientID                                  = big.NewInt(1 << 18)
+	resourceServerFieldAllowOnlineAccess                         = big.NewInt(1 << 8)
+	resourceServerFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 9)
+	resourceServerFieldTokenLifetime                             = big.NewInt(1 << 10)
+	resourceServerFieldTokenLifetimeForWeb                       = big.NewInt(1 << 11)
+	resourceServerFieldEnforcePolicies                           = big.NewInt(1 << 12)
+	resourceServerFieldTokenDialect                              = big.NewInt(1 << 13)
+	resourceServerFieldTokenEncryption                           = big.NewInt(1 << 14)
+	resourceServerFieldConsentPolicy                             = big.NewInt(1 << 15)
+	resourceServerFieldAuthorizationDetails                      = big.NewInt(1 << 16)
+	resourceServerFieldProofOfPossession                         = big.NewInt(1 << 17)
+	resourceServerFieldSubjectTypeAuthorization                  = big.NewInt(1 << 18)
+	resourceServerFieldClientID                                  = big.NewInt(1 << 19)
 )
 
 type ResourceServer struct {
@@ -947,6 +982,8 @@ type ResourceServer struct {
 	SigningSecret *string `json:"signing_secret,omitempty" url:"signing_secret,omitempty"`
 	// Whether refresh tokens can be issued for this API (true) or not (false).
 	AllowOfflineAccess *bool `json:"allow_offline_access,omitempty" url:"allow_offline_access,omitempty"`
+	// Whether Online Refresh Tokens can be issued for this API (true) or not (false).
+	AllowOnlineAccess *bool `json:"allow_online_access,omitempty" url:"allow_online_access,omitempty"`
 	// Whether to skip user consent for applications flagged as first party (true) or not (false).
 	SkipConsentForVerifiableFirstPartyClients *bool `json:"skip_consent_for_verifiable_first_party_clients,omitempty" url:"skip_consent_for_verifiable_first_party_clients,omitempty"`
 	// Expiration value (in seconds) for access tokens issued for this API from the token endpoint.
@@ -958,7 +995,7 @@ type ResourceServer struct {
 	TokenDialect             *ResourceServerTokenDialectResponseEnum `json:"token_dialect,omitempty" url:"token_dialect,omitempty"`
 	TokenEncryption          *ResourceServerTokenEncryption          `json:"token_encryption,omitempty" url:"token_encryption,omitempty"`
 	ConsentPolicy            *ResourceServerConsentPolicyEnum        `json:"consent_policy,omitempty" url:"consent_policy,omitempty"`
-	AuthorizationDetails     []interface{}                           `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
+	AuthorizationDetails     []any                                   `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
 	ProofOfPossession        *ResourceServerProofOfPossession        `json:"proof_of_possession,omitempty" url:"proof_of_possession,omitempty"`
 	SubjectTypeAuthorization *ResourceServerSubjectTypeAuthorization `json:"subject_type_authorization,omitempty" url:"subject_type_authorization,omitempty"`
 	// The client ID of the client that this resource server is linked to
@@ -1027,6 +1064,13 @@ func (r *ResourceServer) GetAllowOfflineAccess() bool {
 	return *r.AllowOfflineAccess
 }
 
+func (r *ResourceServer) GetAllowOnlineAccess() bool {
+	if r == nil || r.AllowOnlineAccess == nil {
+		return false
+	}
+	return *r.AllowOnlineAccess
+}
+
 func (r *ResourceServer) GetSkipConsentForVerifiableFirstPartyClients() bool {
 	if r == nil || r.SkipConsentForVerifiableFirstPartyClients == nil {
 		return false
@@ -1076,7 +1120,7 @@ func (r *ResourceServer) GetConsentPolicy() ResourceServerConsentPolicyEnum {
 	return *r.ConsentPolicy
 }
 
-func (r *ResourceServer) GetAuthorizationDetails() []interface{} {
+func (r *ResourceServer) GetAuthorizationDetails() []any {
 	if r == nil || r.AuthorizationDetails == nil {
 		return nil
 	}
@@ -1174,6 +1218,13 @@ func (r *ResourceServer) SetAllowOfflineAccess(allowOfflineAccess *bool) {
 	r.require(resourceServerFieldAllowOfflineAccess)
 }
 
+// SetAllowOnlineAccess sets the AllowOnlineAccess field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *ResourceServer) SetAllowOnlineAccess(allowOnlineAccess *bool) {
+	r.AllowOnlineAccess = allowOnlineAccess
+	r.require(resourceServerFieldAllowOnlineAccess)
+}
+
 // SetSkipConsentForVerifiableFirstPartyClients sets the SkipConsentForVerifiableFirstPartyClients field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (r *ResourceServer) SetSkipConsentForVerifiableFirstPartyClients(skipConsentForVerifiableFirstPartyClients *bool) {
@@ -1225,7 +1276,7 @@ func (r *ResourceServer) SetConsentPolicy(consentPolicy *ResourceServerConsentPo
 
 // SetAuthorizationDetails sets the AuthorizationDetails field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (r *ResourceServer) SetAuthorizationDetails(authorizationDetails []interface{}) {
+func (r *ResourceServer) SetAuthorizationDetails(authorizationDetails []any) {
 	r.AuthorizationDetails = authorizationDetails
 	r.require(resourceServerFieldAuthorizationDetails)
 }
@@ -2256,17 +2307,18 @@ var (
 	updateResourceServerResponseContentFieldSigningAlg                                = big.NewInt(1 << 5)
 	updateResourceServerResponseContentFieldSigningSecret                             = big.NewInt(1 << 6)
 	updateResourceServerResponseContentFieldAllowOfflineAccess                        = big.NewInt(1 << 7)
-	updateResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 8)
-	updateResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 9)
-	updateResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 10)
-	updateResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 11)
-	updateResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 12)
-	updateResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 13)
-	updateResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 14)
-	updateResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 15)
-	updateResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 16)
-	updateResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 17)
-	updateResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 18)
+	updateResourceServerResponseContentFieldAllowOnlineAccess                         = big.NewInt(1 << 8)
+	updateResourceServerResponseContentFieldSkipConsentForVerifiableFirstPartyClients = big.NewInt(1 << 9)
+	updateResourceServerResponseContentFieldTokenLifetime                             = big.NewInt(1 << 10)
+	updateResourceServerResponseContentFieldTokenLifetimeForWeb                       = big.NewInt(1 << 11)
+	updateResourceServerResponseContentFieldEnforcePolicies                           = big.NewInt(1 << 12)
+	updateResourceServerResponseContentFieldTokenDialect                              = big.NewInt(1 << 13)
+	updateResourceServerResponseContentFieldTokenEncryption                           = big.NewInt(1 << 14)
+	updateResourceServerResponseContentFieldConsentPolicy                             = big.NewInt(1 << 15)
+	updateResourceServerResponseContentFieldAuthorizationDetails                      = big.NewInt(1 << 16)
+	updateResourceServerResponseContentFieldProofOfPossession                         = big.NewInt(1 << 17)
+	updateResourceServerResponseContentFieldSubjectTypeAuthorization                  = big.NewInt(1 << 18)
+	updateResourceServerResponseContentFieldClientID                                  = big.NewInt(1 << 19)
 )
 
 type UpdateResourceServerResponseContent struct {
@@ -2285,6 +2337,8 @@ type UpdateResourceServerResponseContent struct {
 	SigningSecret *string `json:"signing_secret,omitempty" url:"signing_secret,omitempty"`
 	// Whether refresh tokens can be issued for this API (true) or not (false).
 	AllowOfflineAccess *bool `json:"allow_offline_access,omitempty" url:"allow_offline_access,omitempty"`
+	// Whether Online Refresh Tokens can be issued for this API (true) or not (false).
+	AllowOnlineAccess *bool `json:"allow_online_access,omitempty" url:"allow_online_access,omitempty"`
 	// Whether to skip user consent for applications flagged as first party (true) or not (false).
 	SkipConsentForVerifiableFirstPartyClients *bool `json:"skip_consent_for_verifiable_first_party_clients,omitempty" url:"skip_consent_for_verifiable_first_party_clients,omitempty"`
 	// Expiration value (in seconds) for access tokens issued for this API from the token endpoint.
@@ -2296,7 +2350,7 @@ type UpdateResourceServerResponseContent struct {
 	TokenDialect             *ResourceServerTokenDialectResponseEnum `json:"token_dialect,omitempty" url:"token_dialect,omitempty"`
 	TokenEncryption          *ResourceServerTokenEncryption          `json:"token_encryption,omitempty" url:"token_encryption,omitempty"`
 	ConsentPolicy            *ResourceServerConsentPolicyEnum        `json:"consent_policy,omitempty" url:"consent_policy,omitempty"`
-	AuthorizationDetails     []interface{}                           `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
+	AuthorizationDetails     []any                                   `json:"authorization_details,omitempty" url:"authorization_details,omitempty"`
 	ProofOfPossession        *ResourceServerProofOfPossession        `json:"proof_of_possession,omitempty" url:"proof_of_possession,omitempty"`
 	SubjectTypeAuthorization *ResourceServerSubjectTypeAuthorization `json:"subject_type_authorization,omitempty" url:"subject_type_authorization,omitempty"`
 	// The client ID of the client that this resource server is linked to
@@ -2365,6 +2419,13 @@ func (u *UpdateResourceServerResponseContent) GetAllowOfflineAccess() bool {
 	return *u.AllowOfflineAccess
 }
 
+func (u *UpdateResourceServerResponseContent) GetAllowOnlineAccess() bool {
+	if u == nil || u.AllowOnlineAccess == nil {
+		return false
+	}
+	return *u.AllowOnlineAccess
+}
+
 func (u *UpdateResourceServerResponseContent) GetSkipConsentForVerifiableFirstPartyClients() bool {
 	if u == nil || u.SkipConsentForVerifiableFirstPartyClients == nil {
 		return false
@@ -2414,7 +2475,7 @@ func (u *UpdateResourceServerResponseContent) GetConsentPolicy() ResourceServerC
 	return *u.ConsentPolicy
 }
 
-func (u *UpdateResourceServerResponseContent) GetAuthorizationDetails() []interface{} {
+func (u *UpdateResourceServerResponseContent) GetAuthorizationDetails() []any {
 	if u == nil || u.AuthorizationDetails == nil {
 		return nil
 	}
@@ -2512,6 +2573,13 @@ func (u *UpdateResourceServerResponseContent) SetAllowOfflineAccess(allowOffline
 	u.require(updateResourceServerResponseContentFieldAllowOfflineAccess)
 }
 
+// SetAllowOnlineAccess sets the AllowOnlineAccess field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateResourceServerResponseContent) SetAllowOnlineAccess(allowOnlineAccess *bool) {
+	u.AllowOnlineAccess = allowOnlineAccess
+	u.require(updateResourceServerResponseContentFieldAllowOnlineAccess)
+}
+
 // SetSkipConsentForVerifiableFirstPartyClients sets the SkipConsentForVerifiableFirstPartyClients field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (u *UpdateResourceServerResponseContent) SetSkipConsentForVerifiableFirstPartyClients(skipConsentForVerifiableFirstPartyClients *bool) {
@@ -2563,7 +2631,7 @@ func (u *UpdateResourceServerResponseContent) SetConsentPolicy(consentPolicy *Re
 
 // SetAuthorizationDetails sets the AuthorizationDetails field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (u *UpdateResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []interface{}) {
+func (u *UpdateResourceServerResponseContent) SetAuthorizationDetails(authorizationDetails []any) {
 	u.AuthorizationDetails = authorizationDetails
 	u.require(updateResourceServerResponseContentFieldAuthorizationDetails)
 }

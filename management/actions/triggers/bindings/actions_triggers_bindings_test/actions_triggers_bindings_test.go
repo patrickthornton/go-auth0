@@ -6,13 +6,14 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
+	http "net/http"
+	os "os"
+	testing "testing"
+
 	management "github.com/auth0/go-auth0/v2/management"
 	client "github.com/auth0/go-auth0/v2/management/client"
 	option "github.com/auth0/go-auth0/v2/management/option"
 	require "github.com/stretchr/testify/require"
-	http "net/http"
-	os "os"
-	testing "testing"
 )
 
 func VerifyRequestCount(
@@ -71,6 +72,7 @@ func TestActionsTriggersBindingsListWithWireMock(
 	}
 	client := client.NewWithOptions(
 		option.WithBaseURL(WireMockBaseURL),
+		option.WithToken("test-token"),
 	)
 	request := &management.ListActionTriggerBindingsRequestParameters{
 		Page: management.Int(
@@ -82,7 +84,7 @@ func TestActionsTriggersBindingsListWithWireMock(
 	}
 	_, invocationErr := client.Actions.Triggers.Bindings.List(
 		context.TODO(),
-		"triggerId",
+		management.ActionTriggerTypeEnumPostLogin.Ptr(),
 		request,
 		option.WithHTTPHeader(
 			http.Header{"X-Test-Id": []string{"TestActionsTriggersBindingsListWithWireMock"}},
@@ -90,7 +92,7 @@ func TestActionsTriggersBindingsListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "TestActionsTriggersBindingsListWithWireMock", "GET", "/actions/triggers/triggerId/bindings", map[string]string{"page": "1", "per_page": "1"}, 1)
+	VerifyRequestCount(t, "TestActionsTriggersBindingsListWithWireMock", "GET", "/actions/triggers/post-login/bindings", map[string]string{"page": "1", "per_page": "1"}, 1)
 }
 
 func TestActionsTriggersBindingsUpdateManyWithWireMock(
@@ -102,11 +104,12 @@ func TestActionsTriggersBindingsUpdateManyWithWireMock(
 	}
 	client := client.NewWithOptions(
 		option.WithBaseURL(WireMockBaseURL),
+		option.WithToken("test-token"),
 	)
 	request := &management.UpdateActionBindingsRequestContent{}
 	_, invocationErr := client.Actions.Triggers.Bindings.UpdateMany(
 		context.TODO(),
-		"triggerId",
+		management.ActionTriggerTypeEnumPostLogin.Ptr(),
 		request,
 		option.WithHTTPHeader(
 			http.Header{"X-Test-Id": []string{"TestActionsTriggersBindingsUpdateManyWithWireMock"}},
@@ -114,5 +117,5 @@ func TestActionsTriggersBindingsUpdateManyWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "TestActionsTriggersBindingsUpdateManyWithWireMock", "PATCH", "/actions/triggers/triggerId/bindings", nil, 1)
+	VerifyRequestCount(t, "TestActionsTriggersBindingsUpdateManyWithWireMock", "PATCH", "/actions/triggers/post-login/bindings", nil, 1)
 }

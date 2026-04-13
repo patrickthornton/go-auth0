@@ -4,11 +4,12 @@ package discoverydomains
 
 import (
 	context "context"
+	http "net/http"
+
 	management "github.com/auth0/go-auth0/v2/management"
 	core "github.com/auth0/go-auth0/v2/management/core"
 	internal "github.com/auth0/go-auth0/v2/management/internal"
 	option "github.com/auth0/go-auth0/v2/management/option"
-	http "net/http"
 )
 
 type Client struct {
@@ -34,6 +35,7 @@ func NewClient(options *core.RequestOptions) *Client {
 }
 
 // Retrieve list of all organization discovery domains associated with the specified organization.
+// This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 func (c *Client) List(
 	ctx context.Context,
 	// ID of the organization.
@@ -124,6 +126,7 @@ func (c *Client) Create(
 }
 
 // Retrieve details about a single organization discovery domain specified by domain name.
+// This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 func (c *Client) GetByName(
 	ctx context.Context,
 	// ID of the organization.
@@ -145,6 +148,7 @@ func (c *Client) GetByName(
 }
 
 // Retrieve details about a single organization discovery domain specified by ID.
+// This endpoint is subject to eventual consistency; newly created, updated, or deleted discovery domains may not immediately appear in the response.
 func (c *Client) Get(
 	ctx context.Context,
 	// ID of the organization.
